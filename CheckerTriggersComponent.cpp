@@ -57,16 +57,12 @@ void UCheckerTriggersComponent::GoMover(bool NewMoverMustGo)
 	}
 }
 
-void UCheckerTriggersComponent::AddArray(FName New)
+void UCheckerTriggersComponent::AddArray(FString New)
 {
 	Checker.AddUnique(New);
-	for (int32 i = 0; i < Checker.Num(); i++)
-	{
-		float test = Checker.Num();
-	}
 }
 
-void UCheckerTriggersComponent::DeleteArray(FName Delete)
+void UCheckerTriggersComponent::DeleteArray(FString Delete)
 {
 	for (int32 i = 0; i < Checker.Num(); i++)
 	{

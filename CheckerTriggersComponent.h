@@ -30,8 +30,8 @@ public:
 
 	void GoMover(bool MoverMustGo);
 
-	void AddArray(FName New);
-	void DeleteArray(FName Delete);
+	void AddArray(FString New);
+	void DeleteArray(FString Delete);
 
 private:
 
@@ -39,8 +39,9 @@ private:
 
 	bool MoverMustGo;
 
-	TArray<FName> Checker;
+	TArray<FString> Checker;
 
 	UPROPERTY(EditAnywhere, Category = "Triggers")
 	int32 HowMuchTriggers = 1;
+
 };

@@ -44,7 +44,7 @@ private:
 	bool EnableMover;
 
 	UPROPERTY(EditAnywhere)
-	FName ActorTag;
+	FString ActorTag;
 	UPROPERTY(EditAnywhere)
 	bool EnableTrigger = false;
 

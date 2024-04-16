@@ -17,6 +17,8 @@ void UTriggerSphereComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Sphere = UTriggerSphereComponent::SphereRadius;
+
+	PlacementLocationForItemOffsetDefault = PlacementLocationOffset;
 	
 	if (CompatibleActorTag == "None")
 	{
@@ -52,14 +54,31 @@ void UTriggerSphereComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		SetPlacement(Actor, DeltaTime);
 		Actor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 		CompatibleActor = Actor->ActorHasTag(CompatibleActorTag);
+		StringCompatibleActorTag = CompatibleActorTag.ToString() + NumberTag;
+		ActorForItemOff = Actor->ActorHasTag(NamePlacementLocationForItemOffset);
+
+		if(ActorForItemOff)
+		{
+			PlacementLocationOffset = PlacementLocationForItemOffset;
+		}
+		else
+		{
+			PlacementLocationOffset = PlacementLocationForItemOffsetDefault;
+		}
+
 		if (Mover != nullptr)
 		{
 			Mover->SetShouldMove(true);
+			if (BothTarget)
+			{
+				CheckerTriggers->GoMover(true);
+				CheckerTriggers->AddArray(StringCompatibleActorTag);
+			}
 		}
 		else if (CompatibleActor)
 		{
 			CheckerTriggers->GoMover(true);
-			CheckerTriggers->AddArray(CompatibleActorTag);
+			CheckerTriggers->AddArray(StringCompatibleActorTag);
 
 		}
 
@@ -69,11 +88,16 @@ void UTriggerSphereComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		if (Mover != nullptr)
 		{
 			Mover->SetShouldMove(false);
+			if (BothTarget)
+			{
+				CheckerTriggers->GoMover(false);
+				CheckerTriggers->DeleteArray(StringCompatibleActorTag);
+			}
 		}
 		else if (CompatibleActor)
 		{
 			CheckerTriggers->GoMover(false);
-			CheckerTriggers->DeleteArray(CompatibleActorTag);
+			CheckerTriggers->DeleteArray(StringCompatibleActorTag);
 		}
 		OriginalPlacement = true;
 		UTriggerSphereComponent::SetSphereRadius(Sphere);
@@ -112,7 +136,7 @@ void UTriggerSphereComponent::SetPlacement(AActor* Actor, float DeltaTime)
 	float Speed = FVector::Distance(OriginalPlacementLocation, TargetPlacementLocation) / PlacementingTime;
 
 	FVector NewPlacementLocation = FMath::VInterpConstantTo(CurrnetPlacementLocation, TargetPlacementLocation, DeltaTime, Speed);
-
+	
 	//Probobly can do better
 	FRotator CurrnetPlacementCorner = Actor->GetActorRotation();
 	FVector CurrnetPlacementCornerVector = FVector(CurrnetPlacementCorner.Pitch, CurrnetPlacementCorner.Yaw, CurrnetPlacementCorner.Roll);
@@ -122,7 +146,7 @@ void UTriggerSphereComponent::SetPlacement(AActor* Actor, float DeltaTime)
 
 	FVector NewPlacementCornerVector = FMath::VInterpConstantTo(CurrnetPlacementCornerVector, TargetPlacementCorner, DeltaTime, SpeedCorner);
 	FRotator NewPlacementCorner = FRotator(NewPlacementCornerVector.X, NewPlacementCornerVector.Y, NewPlacementCornerVector.Z);
-
+	
 	Actor->SetActorLocationAndRotation(NewPlacementLocation, NewPlacementCorner);
 
 }

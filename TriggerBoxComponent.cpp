@@ -18,6 +18,8 @@ void UTriggerBoxComponent::BeginPlay()
 
 	Box = UTriggerBoxComponent::BoxExtent;
 
+	PlacementLocationForItemOffsetDefault = PlacementLocationOffset;
+
 	if (CompatibleActorTag == "None")
 	{
 		CompatibleActorTag = AcceptableActorTag;
@@ -52,14 +54,31 @@ void UTriggerBoxComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		SetPlacement(Actor, DeltaTime);
 		Actor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 		CompatibleActor = Actor->ActorHasTag(CompatibleActorTag);
+		StringCompatibleActorTag = CompatibleActorTag.ToString() + NumberTag;
+		ActorForItemOff = Actor->ActorHasTag(NamePlacementLocationForItemOffset);
+
+		if (ActorForItemOff)
+		{
+			PlacementLocationOffset = PlacementLocationForItemOffset;
+		}
+		else
+		{
+			PlacementLocationOffset = PlacementLocationForItemOffsetDefault;
+		}
+
 		if (Mover != nullptr)
 		{
 			Mover->SetShouldMove(true);
+			if (BothTarget)
+			{
+				CheckerTriggers->GoMover(true);
+				CheckerTriggers->AddArray(StringCompatibleActorTag);
+			}
 		}
 		else if (CompatibleActor)
 		{
 			CheckerTriggers->GoMover(true);
-			CheckerTriggers->AddArray(CompatibleActorTag);
+			CheckerTriggers->AddArray(StringCompatibleActorTag);
 
 		}
 
@@ -69,11 +88,16 @@ void UTriggerBoxComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		if (Mover != nullptr)
 		{
 			Mover->SetShouldMove(false);
+			if (BothTarget)
+			{
+				CheckerTriggers->GoMover(false);
+				CheckerTriggers->DeleteArray(StringCompatibleActorTag);
+			}
 		}
 		else if (CompatibleActor)
 		{
 			CheckerTriggers->GoMover(false);
-			CheckerTriggers->DeleteArray(CompatibleActorTag);
+			CheckerTriggers->DeleteArray(StringCompatibleActorTag);
 		}
 		OriginalPlacement = true;
 		UTriggerBoxComponent::SetBoxExtent(Box);

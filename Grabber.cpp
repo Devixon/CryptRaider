@@ -21,6 +21,8 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
+	NowHoldDistance = HoldDistance;
+
 }
 
 
@@ -35,6 +37,9 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		FVector TargetLocation = GetComponentLocation() + GetForwardVector() * HoldDistance;
 		PhysicsHandle->SetTargetLocationAndRotation(TargetLocation, GetComponentRotation());
 	}
+
+	GetGrabbableInReach();
+
 }
 
 void UGrabber::Grab()
@@ -58,7 +63,6 @@ void UGrabber::Grab()
 			GetComponentRotation()
 		);
 	}
-
 }
 
 void UGrabber::Release()
@@ -98,4 +102,30 @@ bool UGrabber::GetGrabbableInReach(FHitResult& OutHitResult) const
 		ECC_GameTraceChannel2,
 		Sphere
 	);
+}
+
+void UGrabber::GetGrabbableInReach()
+{
+	FVector Start = GetComponentLocation() - FVector(20.f, 0.f, 0.f);
+	FVector End = Start + FVector(50.f, 0.f, 0.f) + GetForwardVector() * MaxGrabDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParms;
+	GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start, End,
+		ECC_GameTraceChannel3,
+		TraceParms
+	);
+
+	float Distance = FVector::Dist(Start, HitResult.ImpactPoint);
+	if (Distance <= MaxGrabDistance)
+	{
+		NowHoldDistance = Distance - 50.f;
+	}
+	else
+	{
+		NowHoldDistance = HoldDistance;
+	}
+
 }

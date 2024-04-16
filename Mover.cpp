@@ -34,9 +34,9 @@ void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 	{
 		if (ShouldCoverMove)
 		{
-			FVector CurrnetCoverLocation = Cover->GetRelativeLocation();
 			FVector TargetCoverLocation = OriginalCoverLocation + CoverMoveOffset;
-			float Speed = FVector::Distance(OriginalCoverLocation, TargetCoverLocation) / CoverMoveTime;
+			FVector CurrnetCoverLocation = Cover->GetRelativeLocation();
+			float Speed = CoverMoveOffset.Length() / MoveTime;
 
 			FVector NewCoverLocation = FMath::VInterpConstantTo(CurrnetCoverLocation, TargetCoverLocation, DeltaTime, Speed);
 			Cover->SetRelativeLocation(NewCoverLocation);
@@ -44,7 +44,19 @@ void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 			if (NewCoverLocation == TargetCoverLocation)
 			{
 				CoverMoveDone = true;
+				ShouldMovePublic = CoverMoveDone;
 			}
+		}
+		else
+		{
+			FVector CurrnetCoverLocation = Cover->GetRelativeLocation();
+			float Speed = CoverMoveOffset.Length() / MoveTime;
+
+			FVector NewCoverLocation = FMath::VInterpConstantTo(CurrnetCoverLocation, OriginalCoverLocation, DeltaTime, Speed);
+			Cover->SetRelativeLocation(NewCoverLocation);
+
+			CoverMoveDone = false;
+
 		}
 	}
 	else
@@ -55,27 +67,40 @@ void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 		}
 	}
 
-	FVector TargetLocation = OriginalLocation;
 	if (ShouldMove && CoverMoveDone)
 	{
-		TargetLocation = OriginalLocation + MoveOffset;
+		FVector TargetLocation = OriginalLocation + MoveOffset;
+		FVector CurrnetLocation = GetOwner()->GetActorLocation();
+		float Speed = MoveOffset.Length() / MoveTime;
+
+		FVector NewLocation = FMath::VInterpConstantTo(CurrnetLocation, TargetLocation, DeltaTime, Speed);
+		GetOwner()->SetActorLocation(NewLocation);
+
+		CloseMovePublic = false;
+
 	}
+	else
+	{
+		FVector BackCurrnetLocation = GetOwner()->GetActorLocation();
+		float Speed = MoveOffset.Length() / MoveTime;
 
-	FVector CurrnetLocation = GetOwner()->GetActorLocation();
-	float Speed = MoveOffset.Length() / MoveTime;
+		FVector NewLocation = FMath::VInterpConstantTo(BackCurrnetLocation, OriginalLocation, DeltaTime, Speed);
+		GetOwner()->SetActorLocation(NewLocation);
 
-	FVector NewLocation = FMath::VInterpConstantTo(CurrnetLocation, TargetLocation, DeltaTime, Speed);
-	GetOwner()->SetActorLocation(NewLocation);
+		CloseMovePublic = true;
+	}
 }
 
 void UMover::SetShouldMove(bool NewShouldMove)
 {
 	ShouldMove = NewShouldMove;
 	ShouldCoverMove = NewShouldMove;
+	ShouldCoverMovePublic = NewShouldMove;
 }
 
 void UMover::SetCover(UPrimitiveComponent* NewCover)
 {
 	Cover = NewCover;
+	OriginalCoverLocation = Cover->GetRelativeLocation();
 }
 

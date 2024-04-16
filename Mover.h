@@ -28,6 +28,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCover(UPrimitiveComponent* Cover);
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool ShouldMovePublic = false;
+	UPROPERTY(BlueprintReadWrite)
+	bool CloseMovePublic = false;
+	UPROPERTY(BlueprintReadWrite)
+	bool ShouldCoverMovePublic = false;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Mover")
@@ -48,7 +55,8 @@ private:
 
 	FVector OriginalLocation;
 	FVector OriginalCoverLocation;
+	FVector PrimalOriginalCoverLocation;
 
 	UPrimitiveComponent* Cover;
-		
+
 };

@@ -43,6 +43,10 @@ private:
 	FName CompatibleActorTag;
 	bool CompatibleActor = false;
 
+	UPROPERTY(EditAnywhere)
+	FString NumberTag;
+	FString StringCompatibleActorTag;
+
 	FVector PlacementLocation;
 	FRotator PlacementCorner;
 
@@ -53,6 +57,14 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Placement Point")
 	float PlacementingTime = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Placement Point For Item")
+	FName NamePlacementLocationForItemOffset;
+	UPROPERTY(EditAnywhere, Category = "Placement Point For Item")
+	FVector PlacementLocationForItemOffset;
+
+	FVector PlacementLocationForItemOffsetDefault;
+	bool ActorForItemOff = false;
 
 	bool OriginalPlacement = true;
 	FVector OriginalPlacementLocation;
@@ -65,6 +77,9 @@ private:
 
 	UMover* Mover;
 	UCheckerTriggersComponent* CheckerTriggers;
+
+	UPROPERTY(EditAnywhere)
+	bool BothTarget = false;
 
 	AActor* GetAcceptableActor() const;
 
